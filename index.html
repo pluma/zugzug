@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="ZugZug : Unfancy task queue built on Redis" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>ZugZug</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/pluma/zugzug">View on GitHub</a>
+
+          <h1 id="project_title">ZugZug</h1>
+          <h2 id="project_tagline">Unfancy task queue built on Redis</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/pluma/zugzug/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/pluma/zugzug/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="synopsis" class="anchor" href="#synopsis"><span class="octicon octicon-link"></span></a>Synopsis</h1>
+
+<p><strong>ZugZug</strong> is an unfancy task queue built on <a href="http://redis.io">Redis</a>.</p>
+
+<p><a href="http://nodejs.org/api/documentation.html#documentation_stability_index"><img src="http://b.repl.ca/v1/stability-1_--_experimental-orange.png" alt="stability 1 - experimental"></a> <a href="http://pluma.mit-license.org"><img src="http://b.repl.ca/v1/license-MIT-blue.png" alt="license - MIT"></a> <a href="https://flattr.com/submit/auto?user_id=pluma&amp;url=https://github.com/pluma/zugzug"><img src="https://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this"></a></p>
+
+<p><a href="https://travis-ci.org/pluma/zugzug"><img src="https://travis-ci.org/pluma/zugzug.png?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/pluma/zugzug?branch=master"><img src="https://coveralls.io/repos/pluma/zugzug/badge.png?branch=master" alt="Coverage Status"></a></p>
+
+<p><a href="https://npmjs.org/package/zugzug"><img src="https://nodei.co/npm/zugzug.png?compact=true" alt="NPM status"></a></p>
+
+<p><a href="https://david-dm.org/pluma/zugzug"><img src="https://david-dm.org/pluma/zugzug.png?theme=shields.io" alt="Dependencies"></a></p>
+
+<h1>
+<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h1>
+
+<p>Because <a href="https://github.com/LearnBoost/kue">Kue</a> does too much and bare <a href="https://github.com/mranney/node_redis">redis</a> is too painful.</p>
+
+<h1>
+<a name="zugzug" class="anchor" href="#zugzug"><span class="octicon octicon-link"></span></a>ZugZug?</h1>
+
+<p><a href="http://www.urbandictionary.com/define.php?term=zug-zug">Zug-zug</a>.</p>
+
+<h1>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h1>
+
+<h2>
+<a name="nodejs" class="anchor" href="#nodejs"><span class="octicon octicon-link"></span></a>Node.js</h2>
+
+<h3>
+<a name="with-npm" class="anchor" href="#with-npm"><span class="octicon octicon-link"></span></a>With NPM</h3>
+
+<div class="highlight highlight-sh"><pre>npm install zugzug
+</pre></div>
+
+<h3>
+<a name="from-source" class="anchor" href="#from-source"><span class="octicon octicon-link"></span></a>From source</h3>
+
+<div class="highlight highlight-sh"><pre>git clone https://github.com/pluma/zugzug.git
+<span class="nb">cd </span>zugzug
+npm install
+make
+</pre></div>
+
+<h1>
+<a name="usage-example" class="anchor" href="#usage-example"><span class="octicon octicon-link"></span></a>Usage example</h1>
+
+<h2>
+<a name="producer" class="anchor" href="#producer"><span class="octicon octicon-link"></span></a>Producer</h2>
+
+<pre><code>var zz = require('zugzug')(); // use local Redis with default settings
+var queue = zz.queue('example');
+
+setInterval(function() {
+    // create a new job
+    var job = queue.createJob();
+    // throw some data in there
+    job.data = 'There is always more work to be done.';
+    // save it to the database
+    job.save().catch(function(err) {
+        console.log('Something is wrong with your database.');
+        console.error(err);
+    });
+}, 2000); // repeat every 2 seconds
+</code></pre>
+
+<h2>
+<a name="consumer-worker" class="anchor" href="#consumer-worker"><span class="octicon octicon-link"></span></a>Consumer (Worker)</h2>
+
+<pre><code>var zz = require('zugzug')();
+var queue = zz.queue('example');
+
+doForever(performJob);
+
+function doForever(work) {
+    return queue.next() // take a job from the queue
+        .then(work) // process the job
+        .then(function() {
+            return doForever(work); // rinse, repeat
+        });
+}
+
+function performJob(job) {
+    try {
+        doSomeWork(job); // do something with the job
+    } catch(err) {
+        // job failed. oh no!
+        console.log('job', job.id, 'failed!');
+        console.error(err);
+        return job.fail(err.message);
+        // but the job can still be re-enqueued later
+    }
+    // job is done! yay!
+    console.log('job', job.id, 'completed!');
+    return job.complete();
+}
+
+function doSomeWork(job) {
+    if (Math.random() &gt; 0.5) {
+        // randomly throw an error here because why not
+        throw new Error("That's a nice program you have there...");
+    }
+    // otherwise does stuff with the job's data
+    console.log(job.data);
+}
+</code></pre>
+
+<h1>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h1>
+
+<p>All asynchronous methods in ZugZug return <a href="https://github.com/petkaantonov/bluebird">bluebird</a> promises and accept node-style callbacks.</p>
+
+<h2>
+<a name="zugzug-1" class="anchor" href="#zugzug-1"><span class="octicon octicon-link"></span></a>ZugZug</h2>
+
+<h3>
+<a name="new-zugzugoptionsobjectzugzug" class="anchor" href="#new-zugzugoptionsobjectzugzug"><span class="octicon octicon-link"></span></a>new ZugZug([options:Object]):ZugZug</h3>
+
+<p>Creates a new <code>ZugZug</code> instance that connects to a Redis server with the given options.</p>
+
+<p>Use of the <code>new</code> keyword is optional.</p>
+
+<p>In addition to the options accepted by <a href="https://github.com/mranney/node_redis#rediscreateclientport-host-options">redis</a>, ZugZug recognizes <code>port</code> and <code>server</code> and passes them on correctly.</p>
+
+<h3>
+<a name="zugzugusedatabasedbnumber-callbackfunctionpromiseself" class="anchor" href="#zugzugusedatabasedbnumber-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>zugzug.useDatabase(db:Number, [callback:Function]):Promise(self)</h3>
+
+<p>Tells the underlying Redis connection to <a href="http://redis.io/commands/SELECT">use the database with the given number</a>. Resolves to the <code>ZugZug</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying <code>SELECT</code> command.</p>
+
+<h3>
+<a name="zugzugqueuenamestringqueue" class="anchor" href="#zugzugqueuenamestringqueue"><span class="octicon octicon-link"></span></a>zugzug.queue([name:String]):Queue</h3>
+
+<p>Returns a <code>Queue</code> instance representing the queue with the given <code>name</code>. Multiple invocations with the same <code>name</code> will return the same instance.</p>
+
+<p>If <code>name</code> is not provided it is set to <code>"default"</code>.</p>
+
+<h3>
+<a name="zugzuggetjobidstring-callbackfunctionpromisejob" class="anchor" href="#zugzuggetjobidstring-callbackfunctionpromisejob"><span class="octicon octicon-link"></span></a>zugzug.getJob(id:String, [callback:Function]):Promise(Job)</h3>
+
+<p>Retrieves the job with the given <code>id</code> from the database. Resolves to a new <code>Job</code> instance representing the job on success or is rejected with the error returned by <code>redis</code> for the underlying <code>HGETALL</code> command.</p>
+
+<p>If the job does not exist, resolves to <code>null</code> instead.</p>
+
+<h3>
+<a name="zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean" class="anchor" href="#zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean"><span class="octicon octicon-link"></span></a>zugzug.moveJob(id:String, toQueue:String, [callback:Function]):Promise(Boolean)</h3>
+
+<p>Moves the job with the given <code>id</code> to the queue <code>toQueue</code>. Resolves to <code>true</code> on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>If the job does not exist, resolves to <code>false</code> instead.</p>
+
+<h3>
+<a name="zugzugresetjobidstring-callbackfunctionpromiseboolean" class="anchor" href="#zugzugresetjobidstring-callbackfunctionpromiseboolean"><span class="octicon octicon-link"></span></a>zugzug.resetJob(id:String, [callback:Function]):Promise(Boolean)</h3>
+
+<p>Re-enqueues the job with the given <code>id</code>. Resolves to <code>true</code> on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>The job will change its state to <code>pending</code> regardless of its previous state.</p>
+
+<p>If the job does not exist, resolves to <code>false</code> instead.</p>
+
+<p>If you want to put a failed job back in the queue, this will let you do that.</p>
+
+<p>If you want the failed job to be retried immediately, use <a href="#zugzugstartjobidstring-callbackfunctionpromisejob">zugzug.startJob</a> instead.</p>
+
+<h3>
+<a name="zugzugstartjobidstring-callbackfunctionpromisejob" class="anchor" href="#zugzugstartjobidstring-callbackfunctionpromisejob"><span class="octicon octicon-link"></span></a>zugzug.startJob(id:String, [callback:Function]):Promise(Job)</h3>
+
+<p>Retrieves the job with the given <code>id</code> from the database. Resolves to a new <code>Job</code> instance representing the job on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>The returned job will change its state to <code>progress</code> regardless of its previous state.</p>
+
+<p>If the job does not exist, resolves to <code>null</code> instead.</p>
+
+<p>If you want to restart a failed job in a worker script, this will let you do that.</p>
+
+<p>If you only want the failed job to be re-enqueued, use <a href="#zugzugresetjobidstring-callbackfunctionpromiseboolean">zugzug.resetJob</a> instead.</p>
+
+<h2>
+<a name="queues" class="anchor" href="#queues"><span class="octicon octicon-link"></span></a>Queues</h2>
+
+<h3>
+<a name="queuecreatejobjob" class="anchor" href="#queuecreatejobjob"><span class="octicon octicon-link"></span></a>queue.createJob():Job</h3>
+
+<p>Returns a new <code>Job</code> instance bound to this queue.</p>
+
+<h3>
+<a name="queuenextcallbackfunctionpromisejob" class="anchor" href="#queuenextcallbackfunctionpromisejob"><span class="octicon octicon-link"></span></a>queue.next([callback:Function]):Promise(Job)</h3>
+
+<p>Retrieves the oldest <code>pending</code> job from the queue. Resolves to a new <code>Job</code> instance representing the job on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>The returned job will change its state from <code>pending</code> to <code>progress</code>.</p>
+
+<p>If the queue is currently empty, it will wait until a new job is added to the queue.</p>
+
+<p>If you want to use ZugZug in a worker script, this will likely be how you want to fetch new jobs from the queue.</p>
+
+<h3>
+<a name="queuedeletecallbackfunctionpromiseself" class="anchor" href="#queuedeletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>queue.delete([callback:Function]):Promise(self)</h3>
+
+<p>Deletes the queue and all associated jobs from the database. Resolves to the <code>Queue</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>This will also remove the queue from the associated <code>ZugZug</code> instance's queue cache, so calling <code>zugzug.queue(queue.name)</code> will return a new <code>Queue</code> object.</p>
+
+<h2>
+<a name="jobs" class="anchor" href="#jobs"><span class="octicon octicon-link"></span></a>Jobs</h2>
+
+<h3>
+<a name="jobidstring-read-only" class="anchor" href="#jobidstring-read-only"><span class="octicon octicon-link"></span></a>job.id:String (read-only)</h3>
+
+<p>The unique ID of the job which can be used to re-load the job with <a href="#zugzuggetjobidstring-callbackfunctionpromisejob">zugzug.getJob</a>. This property is only defined if the job has been saved to the database.</p>
+
+<h3>
+<a name="jobdata" class="anchor" href="#jobdata"><span class="octicon octicon-link"></span></a>job.data:*</h3>
+
+<p>The job's user-defined data. Will be serialized to JSON for storage in Redis, so you may want to avoid relying on non-serializable objects. Defaults to an empty object.</p>
+
+<h3>
+<a name="jobqueuestring-read-only" class="anchor" href="#jobqueuestring-read-only"><span class="octicon octicon-link"></span></a>job.queue:String (read-only)</h3>
+
+<p>The name of the queue this job is bound to. If you want to move a job to a different queue, use <a href="#zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean">zugzug.moveJob(id, name)</a>.</p>
+
+<h3>
+<a name="jobstatestring-read-only" class="anchor" href="#jobstatestring-read-only"><span class="octicon octicon-link"></span></a>job.state:String (read-only)</h3>
+
+<p>The current state of the job. This property is only defined if the job has been saved to the database.</p>
+
+<h4>
+<a name="pending" class="anchor" href="#pending"><span class="octicon octicon-link"></span></a>pending</h4>
+
+<p>The job has been added to the queue and is waiting to be picked up by a worker.</p>
+
+<h4>
+<a name="progress" class="anchor" href="#progress"><span class="octicon octicon-link"></span></a>progress</h4>
+
+<p>The job has been picked up by a worker and is currently being worked on.</p>
+
+<h4>
+<a name="error" class="anchor" href="#error"><span class="octicon octicon-link"></span></a>error</h4>
+
+<p>The job has failed too many times.</p>
+
+<p>See <a href="#jobfaildetails-callbackfunctionpromiseself">job.fail</a>.</p>
+
+<h4>
+<a name="done" class="anchor" href="#done"><span class="octicon octicon-link"></span></a>done</h4>
+
+<p>The job has been completed successfully.</p>
+
+<h3>
+<a name="jobprogressnumber-read-only" class="anchor" href="#jobprogressnumber-read-only"><span class="octicon octicon-link"></span></a>job.progress:Number (read-only)</h3>
+
+<p>The progress of this job at the time of the most recent update. This value will be set to <code>0</code> whenever the job is (re-)started.</p>
+
+<h3>
+<a name="jobfailuresnumber-read-only" class="anchor" href="#jobfailuresnumber-read-only"><span class="octicon octicon-link"></span></a>job.failures:Number (read-only)</h3>
+
+<p>The number of times that this job has failed.</p>
+
+<p>See <a href="#jobfaildetails-callbackfunctionpromiseself">job.fail</a>.</p>
+
+<h3>
+<a name="jobmaxfailuresnumber" class="anchor" href="#jobmaxfailuresnumber"><span class="octicon octicon-link"></span></a>job.maxFailures:Number</h3>
+
+<p>The maximum number of times the job is allowed to fail before it will no longer be tried again.</p>
+
+<p>See <a href="#jobfaildetails-callbackfunctionpromiseself">job.fail</a>.</p>
+
+<h3>
+<a name="jobcreateddate-read-only" class="anchor" href="#jobcreateddate-read-only"><span class="octicon octicon-link"></span></a>job.created:Date (read-only)</h3>
+
+<p>The <code>Date</code> at which the job was first saved to the database. Will be set automatically on the first call to <code>save</code> or when the job is loaded from the database.</p>
+
+<h3>
+<a name="jobupdateddate-read-only" class="anchor" href="#jobupdateddate-read-only"><span class="octicon octicon-link"></span></a>job.updated:Date (read-only)</h3>
+
+<p>The <code>Date</code> at which the job was last saved to the database. Will be updated automatically for every operation that modifies the job in the database (including <code>job.log</code>).</p>
+
+<h3>
+<a name="jobsavecallbackfunctionpromiseself" class="anchor" href="#jobsavecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.save([callback:Function]):Promise(self)</h3>
+
+<p>Saves the job to the database. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>If the job did not exist in the database before, it will be assigned <a href="#jobidstring-read-only">a unique ID</a> and its <a href="#jobstatestring-read-only">state</a> will be set to <a href="#pending">pending</a>.</p>
+
+<h3>
+<a name="jobupdateprogressnumber-messagestring-callbackfunctionpromiseself" class="anchor" href="#jobupdateprogressnumber-messagestring-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.update(progress:Number, [message:String], [callback:Function]):Promise(self)</h3>
+
+<p>Updates the <a href="#jobprogressnumber-read-only">job's progress</a> to the given <code>progress</code>. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>The <code>progress</code> should be a value between <code>0.0</code> and <code>1.0</code>.</p>
+
+<p>If <code>message</code> is provided, a matching log entry will be created.</p>
+
+<h3>
+<a name="joblogmessagestring-details-callbackfunctionpromiseself" class="anchor" href="#joblogmessagestring-details-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.log(message:String, [details:*], [callback:Function]):Promise(self)</h3>
+
+<p>Logs the given <code>message</code> to the job's log with the current timestamp. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>If <code>details</code> is provided, it will be serialized to JSON and stored on the log message.</p>
+
+<h3>
+<a name="jobcompletecallbackfunctionpromiseself" class="anchor" href="#jobcompletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.complete([callback:Function]):Promise(self)</h3>
+
+<p>Sets the job's state to <code>done</code> and creates a log entry indicating success. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<h3>
+<a name="jobfaildetails-callbackfunctionpromiseself" class="anchor" href="#jobfaildetails-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.fail([details:*], [callback:Function]):Promise(self)</h3>
+
+<p>Increments the <a href="#jobfailuresnumber-read-only">job's number of failures</a> and creates a log entry indicating failure. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>If <code>failures</code> is lower than the job's <code>maxFailures</code> or <code>maxFailures</code> is set to <code>0</code>, the job's state will be reset to <code>pending</code> and it will be re-enqueued automatically.</p>
+
+<p>If <code>failures</code> is greater than or equal to the job's <code>maxFailures</code>, the job's state will be set to <code>error</code> and it will not be re-enqueued.</p>
+
+<p>If <code>details</code> is provided, it will be serialized to JSON and stored on the log message.</p>
+
+<h3>
+<a name="jobdeletecallbackfunctionpromiseself" class="anchor" href="#jobdeletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.delete([callback:Function]):Promise(self)</h3>
+
+<p>Deletes the job from the database. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>The MIT/Expat license. For more information, see <a href="http://pluma.mit-license.org/">http://pluma.mit-license.org/</a> or the accompanying <a href="https://github.com/pluma/zugzug/blob/master/LICENSE">LICENSE</a> file.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">ZugZug maintained by <a href="https://github.com/pluma">pluma</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
