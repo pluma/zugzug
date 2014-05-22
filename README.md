@@ -2,7 +2,7 @@
 
 **ZugZug** is an unfancy task queue built on [Redis](http://redis.io).
 
-[![stability 1 - experimental](http://b.repl.ca/v1/stability-1_--_experimental-orange.png](http://nodejs.org/api/documentation.html#documentation_stability_index) [![license - MIT](http://b.repl.ca/v1/license-MIT-blue.png)](http://pluma.mit-license.org) [![Flattr this](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=pluma&url=https://github.com/pluma/zugzug)
+[![stability 1 - experimental](http://b.repl.ca/v1/stability-1_--_experimental-orange.png)](http://nodejs.org/api/documentation.html#documentation_stability_index) [![license - MIT](http://b.repl.ca/v1/license-MIT-blue.png)](http://pluma.mit-license.org) [![Flattr this](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=pluma&url=https://github.com/pluma/zugzug)
 
 [![Build Status](https://travis-ci.org/pluma/zugzug.png?branch=master)](https://travis-ci.org/pluma/zugzug) [![Coverage Status](https://coveralls.io/repos/pluma/zugzug/badge.png?branch=master)](https://coveralls.io/r/pluma/zugzug?branch=master)
 
