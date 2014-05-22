@@ -113,7 +113,7 @@ Use of the `new` keyword is optional.
 
 In addition to the options accepted by [redis](https://github.com/mranney/node_redis#rediscreateclientport-host-options), ZugZug recognizes `port` and `server` and passes them on correctly.
 
-### zugzug.useDatabase(db:Number, [callback:Function]):Promise<self>
+### zugzug.useDatabase(db:Number, [callback:Function]):Promise(self)
 
 Tells the underlying Redis connection to [use the database with the given number](http://redis.io/commands/SELECT). Resolves to the `ZugZug` instance itself on success or is rejected with the error returned by `redis` for the underlying `SELECT` command.
 
@@ -123,19 +123,19 @@ Returns a `Queue` instance representing the queue with the given `name`. Multipl
 
 If `name` is not provided it is set to `"default"`.
 
-### zugzug.getJob(id:String, [callback:Function]):Promise<Job>
+### zugzug.getJob(id:String, [callback:Function]):Promise(Job)
 
 Retrieves the job with the given `id` from the database. Resolves to a new `Job` instance representing the job on success or is rejected with the error returned by `redis` for the underlying `HGETALL` command.
 
 If the job does not exist, resolves to `null` instead.
 
-### queue.move(id:String, toQueue:String, [callback:Function]):Promise<Boolean>
+### queue.move(id:String, toQueue:String, [callback:Function]):Promise(Boolean)
 
 Moves the job with the given `id` to the queue `toQueue`. Resolves to `true` on success or is rejected with the error returned by `redis` for the underlying commands.
 
 If the job does not exist, resolves to `false` instead.
 
-### zugzug.resetJob(id:String, [callback:Function]):Promise<Boolean>
+### zugzug.resetJob(id:String, [callback:Function]):Promise(Boolean)
 
 Re-enqueues the job with the given `id`. Resolves to `true` on success or is rejected with the error returned by `redis` for the underlying commands.
 
@@ -147,7 +147,7 @@ If you want to put a failed job back in the queue, this will let you do that.
 
 If you want the failed job to be retried immediately, use [zugzug.startJob](#zugzugstartjobidstring-callbackfunctionpromisejob) instead.
 
-### zugzug.startJob(id:String, [callback:Function]):Promise<Job>
+### zugzug.startJob(id:String, [callback:Function]):Promise(Job)
 
 Retrieves the job with the given `id` from the database. Resolves to a new `Job` instance representing the job on success or is rejected with the error returned by `redis` for the underlying commands.
 
@@ -165,7 +165,7 @@ If you only want the failed job to be re-enqueued, use [zugzug.resetJob](#zugzug
 
 Returns a new `Job` instance bound to this queue.
 
-### queue.next([callback:Function]):Promise<Job>
+### queue.next([callback:Function]):Promise(Job)
 
 Retrieves the oldest `pending` job from the queue. Resolves to a new `Job` instance representing the job on success or is rejected with the error returned by `redis` for the underlying commands.
 
@@ -175,7 +175,7 @@ If the queue is currently empty, it will wait until a new job is added to the qu
 
 If you want to use ZugZug in a worker script, this will likely be how you want to fetch new jobs from the queue.
 
-### queue.delete([callback:Function]):Promise<self>
+### queue.delete([callback:Function]):Promise(self)
 
 Deletes the queue and all associated jobs from the database. Resolves to the `Queue` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
@@ -241,13 +241,13 @@ The `Date` at which the job was first saved to the database. Will be set automat
 
 The `Date` at which the job was last saved to the database. Will be updated automatically for every operation that modifies the job in the database (including `job.log`).
 
-### job.save([callback:Function]):Promise<self>
+### job.save([callback:Function]):Promise(self)
 
 Saves the job to the database. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
 If the job did not exist in the database before, it will be assigned [a unique ID](#jobidstringread-only) and its [state](#jobstatestringread-only) will be set to [pending](#pending).
 
-### job.update(progress:Number, [message:String], [callback:Function]):Promise<self>
+### job.update(progress:Number, [message:String], [callback:Function]):Promise(self)
 
 Updates the [job's progress](#jobprogressread-only) to the given `progress`. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
@@ -255,17 +255,17 @@ The `progress` should be a value between `0.0` and `1.0`.
 
 If `message` is provided, a matching log entry will be created.
 
-### job.log(message:String, [details:*], [callback:Function]):Promise<self>
+### job.log(message:String, [details:*], [callback:Function]):Promise(self)
 
 Logs the given `message` to the job's log with the current timestamp. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
 If `details` is provided, it will be serialized to JSON and stored on the log message.
 
-### job.complete([callback:Function]):Promise<self>
+### job.complete([callback:Function]):Promise(self)
 
 Sets the job's state to `done` and creates a log entry indicating success. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
-### job.fail([details:*], [callback:Function]):Promise<self>
+### job.fail([details:*], [callback:Function]):Promise(self)
 
 Increments the [job's number of failures](#jobfailuresread-only) and creates a log entry indicating failure. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
@@ -275,7 +275,7 @@ If `failures` is greater than or equal to the job's `maxFailures`, the job's sta
 
 If `details` is provided, it will be serialized to JSON and stored on the log message.
 
-### job.delete([callback:Function]):Promise<self>
+### job.delete([callback:Function]):Promise(self)
 
 Deletes the job from the database. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
