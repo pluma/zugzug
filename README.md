@@ -249,7 +249,7 @@ If the job did not exist in the database before, it will be assigned [a unique I
 
 ### job.update(progress:Number, [message:String], [callback:Function]):Promise(self)
 
-Updates the [job's progress](#jobprogress-read-only) to the given `progress`. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
+Updates the [job's progress](#jobprogressnumber-read-only) to the given `progress`. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
 The `progress` should be a value between `0.0` and `1.0`.
 
