@@ -185,7 +185,7 @@ This will also remove the queue from the associated `ZugZug` instance's queue ca
 
 ### job.id:String (read-only)
 
-The unique ID of the job which can be used to re-load the job with [zugzug.getJob](#zugzuggetjobidnumber-callbackfunctionpromisejob). This property is only defined if the job has been saved to the database.
+The unique ID of the job which can be used to re-load the job with [zugzug.getJob](#zugzuggetjobidstring-callbackfunctionpromisejob). This property is only defined if the job has been saved to the database.
 
 ### job.data:*
 
