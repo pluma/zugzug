@@ -211,7 +211,7 @@ The job has been picked up by a worker and is currently being worked on.
 
 The job has failed too many times.
 
-See [job.fail](#jobfaildetailscallbackfunctionpromiseself).
+See [job.fail](#jobfaildetails-callbackfunctionpromiseself).
 
 #### done
 
@@ -225,13 +225,13 @@ The progress of this job at the time of the most recent update. This value will 
 
 The number of times that this job has failed.
 
-See [job.fail](#jobfaildetailscallbackfunctionpromiseself).
+See [job.fail](#jobfaildetails-callbackfunctionpromiseself).
 
 ### job.maxFailures:Number
 
 The maximum number of times the job is allowed to fail before it will no longer be tried again.
 
-See [job.fail](#jobfaildetailscallbackfunctionpromiseself).
+See [job.fail](#jobfaildetails-callbackfunctionpromiseself).
 
 ### job.created:Date (read-only)
 
@@ -245,11 +245,11 @@ The `Date` at which the job was last saved to the database. Will be updated auto
 
 Saves the job to the database. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
-If the job did not exist in the database before, it will be assigned [a unique ID](#jobidstringread-only) and its [state](#jobstatestringread-only) will be set to [pending](#pending).
+If the job did not exist in the database before, it will be assigned [a unique ID](#jobidstring-read-only) and its [state](#jobstatestring-read-only) will be set to [pending](#pending).
 
 ### job.update(progress:Number, [message:String], [callback:Function]):Promise(self)
 
-Updates the [job's progress](#jobprogressread-only) to the given `progress`. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
+Updates the [job's progress](#jobprogress-read-only) to the given `progress`. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
 The `progress` should be a value between `0.0` and `1.0`.
 
@@ -267,7 +267,7 @@ Sets the job's state to `done` and creates a log entry indicating success. Resol
 
 ### job.fail([details:*], [callback:Function]):Promise(self)
 
-Increments the [job's number of failures](#jobfailuresread-only) and creates a log entry indicating failure. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
+Increments the [job's number of failures](#jobfailuresnumber-read-only) and creates a log entry indicating failure. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
 
 If `failures` is lower than the job's `maxFailures` or `maxFailures` is set to `0`, the job's state will be reset to `pending` and it will be re-enqueued automatically.
 
