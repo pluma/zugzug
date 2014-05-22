@@ -129,7 +129,7 @@ Retrieves the job with the given `id` from the database. Resolves to a new `Job`
 
 If the job does not exist, resolves to `null` instead.
 
-### queue.move(id:String, toQueue:String, [callback:Function]):Promise(Boolean)
+### zugzug.moveJob(id:String, toQueue:String, [callback:Function]):Promise(Boolean)
 
 Moves the job with the given `id` to the queue `toQueue`. Resolves to `true` on success or is rejected with the error returned by `redis` for the underlying commands.
 
