@@ -193,7 +193,7 @@ The job's user-defined data. Will be serialized to JSON for storage in Redis, so
 
 ### job.queue:String (read-only)
 
-The name of the queue this job is bound to. If you want to move a job to a different queue, use [zugzug.moveJob(id, name)](#zugzugmovejobidstring-namestring-callbackfunctionpromiseself).
+The name of the queue this job is bound to. If you want to move a job to a different queue, use [zugzug.moveJob(id, name)](#zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean).
 
 ### job.state:String (read-only)
 
