@@ -175,6 +175,14 @@ See [job.data](#jobdata).
 
 See [job.maxFailures](#jobmaxfailuresnumber).
 
+### `queue.getInfo([callback:Function]):Promise(Object)`
+
+Collects statistics for the queue from the databases. Resolves to an object containing the statistical information on success or is rejected with the error returned by `redis` for the underlying commands.
+
+The result object will contain a property `total` denoting the total number of jobs in the queue, as well as a property for each possible state denoting the number of jobs in the queue that are currently set to each respective state.
+
+See [job.state](#jobstatestring-read-only).
+
 ### `queue.next([timeout:Number], [callback:Function]):Promise(Job)`
 
 Retrieves the oldest `pending` job from the queue. Resolves to a new `Job` instance representing the job on success or is rejected with the error returned by `redis` for the underlying commands.
