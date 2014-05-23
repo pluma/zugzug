@@ -1,8 +1,7 @@
-/*global describe: false, it: false */
 var expect = require('expect.js');
 var exclude = require('../util/exclude');
 
-describe('exclude(obj, keys…)', function() {
+describe('exclude(obj, keys…):Object', function() {
   it('returns a new object', function() {
     var a = {};
     var b = exclude(a);
