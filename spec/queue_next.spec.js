@@ -17,7 +17,7 @@ describe('queue.next([timeout]):Promise(Job?)', function() {
     expect(q.next(1)).to.be.a(Promise);
   });
   it('resolves to null if the timeout was reached', function(done) {
-    this.timeout(5000);
+    this.timeout(0);
     q.next(1)
     .then(function(res) {
       expect(res).to.equal(null);
@@ -25,6 +25,7 @@ describe('queue.next([timeout]):Promise(Job?)', function() {
     .done(done);
   });
   it('resolves to a Job when a job is in the queue', function(done) {
+    this.timeout(0);
     q.createJob().save()
     .then(function() {
       return q.next();
@@ -35,6 +36,7 @@ describe('queue.next([timeout]):Promise(Job?)', function() {
     .done(done);
   });
   it('resolves to a Job when a job is added to the queue', function(done) {
+    this.timeout(0);
     /*global process: false */
     process.nextTick(function() {
       q.createJob().save().done();
