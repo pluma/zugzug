@@ -161,9 +161,13 @@ If you only want the failed job to be re-enqueued, use [zugzug.resetJob](#zugzug
 
 ## Queues
 
-### `queue.createJob():Job`
+### `queue.createJob([data:*, [maxFailures:Number]]):Job`
 
 Returns a new `Job` instance bound to this queue.
+
+See [job.data](#jobdata).
+
+See [job.maxFailures](#jobmaxfailuresnumber).
 
 ### `queue.next([timeout:Number], [callback:Function]):Promise(Job)`
 
@@ -189,7 +193,7 @@ This will also remove the queue from the associated `ZugZug` instance's queue ca
 
 The unique ID of the job which can be used to re-load the job with [zugzug.getJob](#zugzuggetjobidstring-callbackfunctionpromisejob). This property is only defined if the job has been saved to the database.
 
-### `job.data:Object`
+### `job.data:*`
 
 The job's user-defined data. Will be serialized to JSON for storage in Redis, so you may want to avoid relying on non-serializable objects. Defaults to an empty object.
 
