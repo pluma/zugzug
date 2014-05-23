@@ -165,13 +165,15 @@ If you only want the failed job to be re-enqueued, use [zugzug.resetJob](#zugzug
 
 Returns a new `Job` instance bound to this queue.
 
-### `queue.next([callback:Function]):Promise(Job)`
+### `queue.next([timeout:Number], [callback:Function]):Promise(Job)`
 
 Retrieves the oldest `pending` job from the queue. Resolves to a new `Job` instance representing the job on success or is rejected with the error returned by `redis` for the underlying commands.
 
 The returned job will change its state from `pending` to `progress`.
 
 If the queue is currently empty, it will wait until a new job is added to the queue.
+
+If a `timeout` is provided, it will resolve to `null` if no job is found in the queue before the given number of seconds has elapsed.
 
 If you want to use ZugZug in a worker script, this will likely be how you want to fetch new jobs from the queue.
 
