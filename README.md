@@ -41,7 +41,7 @@ make
 
 ## Producer
 
-```
+```javascript
 var zz = require('zugzug')(); // use local Redis with default settings
 var queue = zz.queue('example');
 
@@ -60,7 +60,7 @@ setInterval(function() {
 
 ## Consumer (Worker)
 
-```
+```javascript
 var zz = require('zugzug')();
 var queue = zz.queue('example');
 
