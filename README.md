@@ -113,6 +113,8 @@ Use of the `new` keyword is optional.
 
 In addition to the options accepted by [redis](https://github.com/mranney/node_redis#rediscreateclientport-host-options), ZugZug recognizes `port` and `server` and passes them on correctly.
 
+If `options.prefix` is defined, all Redis keys will use that prefix. Defaults to `zugzug:`.
+
 ### `zugzug.useDatabase(db:Number, [callback:Function]):Promise(self)`
 
 Tells the underlying Redis connection to [use the database with the given number](http://redis.io/commands/SELECT). Resolves to the `ZugZug` instance itself on success or is rejected with the error returned by `redis` for the underlying `SELECT` command.
