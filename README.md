@@ -273,6 +273,10 @@ Logs the given `message` to the job's log with the current timestamp. Resolves t
 
 If `details` is provided, it will be serialized to JSON and stored on the log message.
 
+### `job.start([callback:Function]):Promise(self)`
+
+Sets the job's state to `progress` and creates a log entry. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
+
 ### `job.complete([callback:Function]):Promise(self)`
 
 Sets the job's state to `done` and creates a log entry indicating success. Resolves to the `Job` instance itself on success or is rejected with the error returned by `redis` for the underlying commands.
