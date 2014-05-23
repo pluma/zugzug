@@ -1,6 +1,6 @@
 {
   "name": "zugzug",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Alan Plum <me@pluma.io>",
   "description": "Unfancy task queue built on Redis.",
   "licenses": {
