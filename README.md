@@ -129,6 +129,12 @@ Retrieves the job with the given `id` from the database. Resolves to a new `Job`
 
 If the job does not exist, resolves to `null` instead.
 
+### `zugzug.getJobLog(id:String, [callback:Function]):Promise(Object[])`
+
+Retrieves the log entries associated with the job with the given `id` from the database. Resolves to an array of log entry objects on success or is rejected with the error returned by `redis` for the underlying `LRANGE` command.
+
+If the job does not exist, resolves to an empty array instead.
+
 ### `zugzug.moveJob(id:String, toQueue:String, [callback:Function]):Promise(Boolean)`
 
 Moves the job with the given `id` to the queue `toQueue`. Resolves to `true` on success or is rejected with the error returned by `redis` for the underlying commands.
