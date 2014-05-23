@@ -81,62 +81,62 @@ make
 <h2>
 <a name="producer" class="anchor" href="#producer"><span class="octicon octicon-link"></span></a>Producer</h2>
 
-<pre><code>var zz = require('zugzug')(); // use local Redis with default settings
-var queue = zz.queue('example');
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">zz</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'zugzug'</span><span class="p">)();</span> <span class="c1">// use local Redis with default settings</span>
+<span class="kd">var</span> <span class="nx">queue</span> <span class="o">=</span> <span class="nx">zz</span><span class="p">.</span><span class="nx">queue</span><span class="p">(</span><span class="s1">'example'</span><span class="p">);</span>
 
-setInterval(function() {
-    // create a new job
-    var job = queue.createJob();
-    // throw some data in there
-    job.data = 'There is always more work to be done.';
-    // save it to the database
-    job.save().catch(function(err) {
-        console.log('Something is wrong with your database.');
-        console.error(err);
-    });
-}, 2000); // repeat every 2 seconds
-</code></pre>
+<span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// create a new job</span>
+    <span class="kd">var</span> <span class="nx">job</span> <span class="o">=</span> <span class="nx">queue</span><span class="p">.</span><span class="nx">createJob</span><span class="p">();</span>
+    <span class="c1">// throw some data in there</span>
+    <span class="nx">job</span><span class="p">.</span><span class="nx">data</span> <span class="o">=</span> <span class="s1">'There is always more work to be done.'</span><span class="p">;</span>
+    <span class="c1">// save it to the database</span>
+    <span class="nx">job</span><span class="p">.</span><span class="nx">save</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Something is wrong with your database.'</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">},</span> <span class="mi">2000</span><span class="p">);</span> <span class="c1">// repeat every 2 seconds</span>
+</pre></div>
 
 <h2>
 <a name="consumer-worker" class="anchor" href="#consumer-worker"><span class="octicon octicon-link"></span></a>Consumer (Worker)</h2>
 
-<pre><code>var zz = require('zugzug')();
-var queue = zz.queue('example');
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">zz</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'zugzug'</span><span class="p">)();</span>
+<span class="kd">var</span> <span class="nx">queue</span> <span class="o">=</span> <span class="nx">zz</span><span class="p">.</span><span class="nx">queue</span><span class="p">(</span><span class="s1">'example'</span><span class="p">);</span>
 
-doForever(performJob);
+<span class="nx">doForever</span><span class="p">(</span><span class="nx">performJob</span><span class="p">);</span>
 
-function doForever(work) {
-    return queue.next() // take a job from the queue
-        .then(work) // process the job
-        .then(function() {
-            return doForever(work); // rinse, repeat
-        });
-}
+<span class="kd">function</span> <span class="nx">doForever</span><span class="p">(</span><span class="nx">work</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">queue</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span> <span class="c1">// take a job from the queue</span>
+        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">work</span><span class="p">)</span> <span class="c1">// process the job</span>
+        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">doForever</span><span class="p">(</span><span class="nx">work</span><span class="p">);</span> <span class="c1">// rinse, repeat</span>
+        <span class="p">});</span>
+<span class="p">}</span>
 
-function performJob(job) {
-    try {
-        doSomeWork(job); // do something with the job
-    } catch(err) {
-        // job failed. oh no!
-        console.log('job', job.id, 'failed!');
-        console.error(err);
-        return job.fail(err.message);
-        // but the job can still be re-enqueued later
-    }
-    // job is done! yay!
-    console.log('job', job.id, 'completed!');
-    return job.complete();
-}
+<span class="kd">function</span> <span class="nx">performJob</span><span class="p">(</span><span class="nx">job</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="nx">doSomeWork</span><span class="p">(</span><span class="nx">job</span><span class="p">);</span> <span class="c1">// do something with the job</span>
+    <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// job failed. oh no!</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'job'</span><span class="p">,</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="s1">'failed!'</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">job</span><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+        <span class="c1">// but the job can still be re-enqueued later</span>
+    <span class="p">}</span>
+    <span class="c1">// job is done! yay!</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'job'</span><span class="p">,</span> <span class="nx">job</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="s1">'completed!'</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">job</span><span class="p">.</span><span class="nx">complete</span><span class="p">();</span>
+<span class="p">}</span>
 
-function doSomeWork(job) {
-    if (Math.random() &gt; 0.5) {
-        // randomly throw an error here because why not
-        throw new Error("That's a nice program you have there...");
-    }
-    // otherwise does stuff with the job's data
-    console.log(job.data);
-}
-</code></pre>
+<span class="kd">function</span> <span class="nx">doSomeWork</span><span class="p">(</span><span class="nx">job</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// randomly throw an error here because why not</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">"That's a nice program you have there..."</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">// otherwise does stuff with the job's data</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">job</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
 
 <h1>
 <a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h1>
@@ -147,7 +147,8 @@ function doSomeWork(job) {
 <a name="zugzug-1" class="anchor" href="#zugzug-1"><span class="octicon octicon-link"></span></a>ZugZug</h2>
 
 <h3>
-<a name="new-zugzugoptionsobjectzugzug" class="anchor" href="#new-zugzugoptionsobjectzugzug"><span class="octicon octicon-link"></span></a>new ZugZug([options:Object]):ZugZug</h3>
+<a name="new-zugzugoptionsobjectzugzug" class="anchor" href="#new-zugzugoptionsobjectzugzug"><span class="octicon octicon-link"></span></a><code>new ZugZug([options:Object]):ZugZug</code>
+</h3>
 
 <p>Creates a new <code>ZugZug</code> instance that connects to a Redis server with the given options.</p>
 
@@ -156,33 +157,46 @@ function doSomeWork(job) {
 <p>In addition to the options accepted by <a href="https://github.com/mranney/node_redis#rediscreateclientport-host-options">redis</a>, ZugZug recognizes <code>port</code> and <code>server</code> and passes them on correctly.</p>
 
 <h3>
-<a name="zugzugusedatabasedbnumber-callbackfunctionpromiseself" class="anchor" href="#zugzugusedatabasedbnumber-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>zugzug.useDatabase(db:Number, [callback:Function]):Promise(self)</h3>
+<a name="zugzugusedatabasedbnumber-callbackfunctionpromiseself" class="anchor" href="#zugzugusedatabasedbnumber-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>zugzug.useDatabase(db:Number, [callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Tells the underlying Redis connection to <a href="http://redis.io/commands/SELECT">use the database with the given number</a>. Resolves to the <code>ZugZug</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying <code>SELECT</code> command.</p>
 
 <h3>
-<a name="zugzugqueuenamestringqueue" class="anchor" href="#zugzugqueuenamestringqueue"><span class="octicon octicon-link"></span></a>zugzug.queue([name:String]):Queue</h3>
+<a name="zugzugqueuenamestringqueue" class="anchor" href="#zugzugqueuenamestringqueue"><span class="octicon octicon-link"></span></a><code>zugzug.queue([name:String]):Queue</code>
+</h3>
 
 <p>Returns a <code>Queue</code> instance representing the queue with the given <code>name</code>. Multiple invocations with the same <code>name</code> will return the same instance.</p>
 
 <p>If <code>name</code> is not provided it is set to <code>"default"</code>.</p>
 
 <h3>
-<a name="zugzuggetjobidstring-callbackfunctionpromisejob" class="anchor" href="#zugzuggetjobidstring-callbackfunctionpromisejob"><span class="octicon octicon-link"></span></a>zugzug.getJob(id:String, [callback:Function]):Promise(Job)</h3>
+<a name="zugzuggetjobidstring-callbackfunctionpromisejob" class="anchor" href="#zugzuggetjobidstring-callbackfunctionpromisejob"><span class="octicon octicon-link"></span></a><code>zugzug.getJob(id:String, [callback:Function]):Promise(Job)</code>
+</h3>
 
 <p>Retrieves the job with the given <code>id</code> from the database. Resolves to a new <code>Job</code> instance representing the job on success or is rejected with the error returned by <code>redis</code> for the underlying <code>HGETALL</code> command.</p>
 
 <p>If the job does not exist, resolves to <code>null</code> instead.</p>
 
 <h3>
-<a name="zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean" class="anchor" href="#zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean"><span class="octicon octicon-link"></span></a>zugzug.moveJob(id:String, toQueue:String, [callback:Function]):Promise(Boolean)</h3>
+<a name="zugzuggetjoblogidstring-callbackfunctionpromiseobject" class="anchor" href="#zugzuggetjoblogidstring-callbackfunctionpromiseobject"><span class="octicon octicon-link"></span></a><code>zugzug.getJobLog(id:String, [callback:Function]):Promise(Object[])</code>
+</h3>
+
+<p>Retrieves the log entries associated with the job with the given <code>id</code> from the database. Resolves to an array of log entry objects on success or is rejected with the error returned by <code>redis</code> for the underlying <code>LRANGE</code> command.</p>
+
+<p>If the job does not exist, resolves to an empty array instead.</p>
+
+<h3>
+<a name="zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean" class="anchor" href="#zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean"><span class="octicon octicon-link"></span></a><code>zugzug.moveJob(id:String, toQueue:String, [callback:Function]):Promise(Boolean)</code>
+</h3>
 
 <p>Moves the job with the given <code>id</code> to the queue <code>toQueue</code>. Resolves to <code>true</code> on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
 <p>If the job does not exist, resolves to <code>false</code> instead.</p>
 
 <h3>
-<a name="zugzugresetjobidstring-callbackfunctionpromiseboolean" class="anchor" href="#zugzugresetjobidstring-callbackfunctionpromiseboolean"><span class="octicon octicon-link"></span></a>zugzug.resetJob(id:String, [callback:Function]):Promise(Boolean)</h3>
+<a name="zugzugresetjobidstring-callbackfunctionpromiseboolean" class="anchor" href="#zugzugresetjobidstring-callbackfunctionpromiseboolean"><span class="octicon octicon-link"></span></a><code>zugzug.resetJob(id:String, [callback:Function]):Promise(Boolean)</code>
+</h3>
 
 <p>Re-enqueues the job with the given <code>id</code>. Resolves to <code>true</code> on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
@@ -195,7 +209,8 @@ function doSomeWork(job) {
 <p>If you want the failed job to be retried immediately, use <a href="#zugzugstartjobidstring-callbackfunctionpromisejob">zugzug.startJob</a> instead.</p>
 
 <h3>
-<a name="zugzugstartjobidstring-callbackfunctionpromisejob" class="anchor" href="#zugzugstartjobidstring-callbackfunctionpromisejob"><span class="octicon octicon-link"></span></a>zugzug.startJob(id:String, [callback:Function]):Promise(Job)</h3>
+<a name="zugzugstartjobidstring-callbackfunctionpromisejob" class="anchor" href="#zugzugstartjobidstring-callbackfunctionpromisejob"><span class="octicon octicon-link"></span></a><code>zugzug.startJob(id:String, [callback:Function]):Promise(Job)</code>
+</h3>
 
 <p>Retrieves the job with the given <code>id</code> from the database. Resolves to a new <code>Job</code> instance representing the job on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
@@ -211,12 +226,28 @@ function doSomeWork(job) {
 <a name="queues" class="anchor" href="#queues"><span class="octicon octicon-link"></span></a>Queues</h2>
 
 <h3>
-<a name="queuecreatejobjob" class="anchor" href="#queuecreatejobjob"><span class="octicon octicon-link"></span></a>queue.createJob():Job</h3>
+<a name="queuecreatejobdata-maxfailuresnumberjob" class="anchor" href="#queuecreatejobdata-maxfailuresnumberjob"><span class="octicon octicon-link"></span></a><code>queue.createJob([data:*, [maxFailures:Number]]):Job</code>
+</h3>
 
 <p>Returns a new <code>Job</code> instance bound to this queue.</p>
 
+<p>See <a href="#jobdata">job.data</a>.</p>
+
+<p>See <a href="#jobmaxfailuresnumber">job.maxFailures</a>.</p>
+
 <h3>
-<a name="queuenextcallbackfunctionpromisejob" class="anchor" href="#queuenextcallbackfunctionpromisejob"><span class="octicon octicon-link"></span></a>queue.next([callback:Function]):Promise(Job)</h3>
+<a name="queuegetinfocallbackfunctionpromiseobject" class="anchor" href="#queuegetinfocallbackfunctionpromiseobject"><span class="octicon octicon-link"></span></a><code>queue.getInfo([callback:Function]):Promise(Object)</code>
+</h3>
+
+<p>Collects statistics for the queue from the databases. Resolves to an object containing the statistical information on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<p>The result object will contain a property <code>total</code> denoting the total number of jobs in the queue, as well as a property for each possible state denoting the number of jobs in the queue that are currently set to each respective state.</p>
+
+<p>See <a href="#jobstatestring-read-only">job.state</a>.</p>
+
+<h3>
+<a name="queuenexttimeoutnumber-callbackfunctionpromisejob" class="anchor" href="#queuenexttimeoutnumber-callbackfunctionpromisejob"><span class="octicon octicon-link"></span></a><code>queue.next([timeout:Number], [callback:Function]):Promise(Job)</code>
+</h3>
 
 <p>Retrieves the oldest <code>pending</code> job from the queue. Resolves to a new <code>Job</code> instance representing the job on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
@@ -224,10 +255,13 @@ function doSomeWork(job) {
 
 <p>If the queue is currently empty, it will wait until a new job is added to the queue.</p>
 
+<p>If a <code>timeout</code> is provided, it will resolve to <code>null</code> if no job is found in the queue before the given number of seconds has elapsed.</p>
+
 <p>If you want to use ZugZug in a worker script, this will likely be how you want to fetch new jobs from the queue.</p>
 
 <h3>
-<a name="queuedeletecallbackfunctionpromiseself" class="anchor" href="#queuedeletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>queue.delete([callback:Function]):Promise(self)</h3>
+<a name="queuedeletecallbackfunctionpromiseself" class="anchor" href="#queuedeletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>queue.delete([callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Deletes the queue and all associated jobs from the database. Resolves to the <code>Queue</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
@@ -237,85 +271,100 @@ function doSomeWork(job) {
 <a name="jobs" class="anchor" href="#jobs"><span class="octicon octicon-link"></span></a>Jobs</h2>
 
 <h3>
-<a name="jobidstring-read-only" class="anchor" href="#jobidstring-read-only"><span class="octicon octicon-link"></span></a>job.id:String (read-only)</h3>
+<a name="jobidstring-read-only" class="anchor" href="#jobidstring-read-only"><span class="octicon octicon-link"></span></a>
+<code>job.id:String</code> (read-only)</h3>
 
 <p>The unique ID of the job which can be used to re-load the job with <a href="#zugzuggetjobidstring-callbackfunctionpromisejob">zugzug.getJob</a>. This property is only defined if the job has been saved to the database.</p>
 
 <h3>
-<a name="jobdata" class="anchor" href="#jobdata"><span class="octicon octicon-link"></span></a>job.data:*</h3>
+<a name="jobdata" class="anchor" href="#jobdata"><span class="octicon octicon-link"></span></a><code>job.data:*</code>
+</h3>
 
 <p>The job's user-defined data. Will be serialized to JSON for storage in Redis, so you may want to avoid relying on non-serializable objects. Defaults to an empty object.</p>
 
 <h3>
-<a name="jobqueuestring-read-only" class="anchor" href="#jobqueuestring-read-only"><span class="octicon octicon-link"></span></a>job.queue:String (read-only)</h3>
+<a name="jobqueuestring-read-only" class="anchor" href="#jobqueuestring-read-only"><span class="octicon octicon-link"></span></a>
+<code>job.queue:String</code> (read-only)</h3>
 
 <p>The name of the queue this job is bound to. If you want to move a job to a different queue, use <a href="#zugzugmovejobidstring-toqueuestring-callbackfunctionpromiseboolean">zugzug.moveJob(id, name)</a>.</p>
 
 <h3>
-<a name="jobstatestring-read-only" class="anchor" href="#jobstatestring-read-only"><span class="octicon octicon-link"></span></a>job.state:String (read-only)</h3>
+<a name="jobstatestring-read-only" class="anchor" href="#jobstatestring-read-only"><span class="octicon octicon-link"></span></a>
+<code>job.state:String</code> (read-only)</h3>
 
 <p>The current state of the job. This property is only defined if the job has been saved to the database.</p>
 
 <h4>
-<a name="pending" class="anchor" href="#pending"><span class="octicon octicon-link"></span></a>pending</h4>
+<a name="pending" class="anchor" href="#pending"><span class="octicon octicon-link"></span></a><code>pending</code>
+</h4>
 
 <p>The job has been added to the queue and is waiting to be picked up by a worker.</p>
 
 <h4>
-<a name="progress" class="anchor" href="#progress"><span class="octicon octicon-link"></span></a>progress</h4>
+<a name="progress" class="anchor" href="#progress"><span class="octicon octicon-link"></span></a><code>progress</code>
+</h4>
 
 <p>The job has been picked up by a worker and is currently being worked on.</p>
 
 <h4>
-<a name="error" class="anchor" href="#error"><span class="octicon octicon-link"></span></a>error</h4>
+<a name="error" class="anchor" href="#error"><span class="octicon octicon-link"></span></a><code>error</code>
+</h4>
 
 <p>The job has failed too many times.</p>
 
 <p>See <a href="#jobfaildetails-callbackfunctionpromiseself">job.fail</a>.</p>
 
 <h4>
-<a name="done" class="anchor" href="#done"><span class="octicon octicon-link"></span></a>done</h4>
+<a name="done" class="anchor" href="#done"><span class="octicon octicon-link"></span></a><code>done</code>
+</h4>
 
 <p>The job has been completed successfully.</p>
 
 <h3>
-<a name="jobprogressnumber-read-only" class="anchor" href="#jobprogressnumber-read-only"><span class="octicon octicon-link"></span></a>job.progress:Number (read-only)</h3>
+<a name="jobprogressnumber-read-only" class="anchor" href="#jobprogressnumber-read-only"><span class="octicon octicon-link"></span></a>
+<code>job.progress:Number</code> (read-only)</h3>
 
 <p>The progress of this job at the time of the most recent update. This value will be set to <code>0</code> whenever the job is (re-)started.</p>
 
 <h3>
-<a name="jobfailuresnumber-read-only" class="anchor" href="#jobfailuresnumber-read-only"><span class="octicon octicon-link"></span></a>job.failures:Number (read-only)</h3>
+<a name="jobfailuresnumber-read-only" class="anchor" href="#jobfailuresnumber-read-only"><span class="octicon octicon-link"></span></a>
+<code>job.failures:Number</code> (read-only)</h3>
 
 <p>The number of times that this job has failed.</p>
 
 <p>See <a href="#jobfaildetails-callbackfunctionpromiseself">job.fail</a>.</p>
 
 <h3>
-<a name="jobmaxfailuresnumber" class="anchor" href="#jobmaxfailuresnumber"><span class="octicon octicon-link"></span></a>job.maxFailures:Number</h3>
+<a name="jobmaxfailuresnumber" class="anchor" href="#jobmaxfailuresnumber"><span class="octicon octicon-link"></span></a><code>job.maxFailures:Number</code>
+</h3>
 
-<p>The maximum number of times the job is allowed to fail before it will no longer be tried again.</p>
+<p>The maximum number of times the job is allowed to fail before it will no longer be tried again. Defaults to <code>1</code>.</p>
 
 <p>See <a href="#jobfaildetails-callbackfunctionpromiseself">job.fail</a>.</p>
 
 <h3>
-<a name="jobcreateddate-read-only" class="anchor" href="#jobcreateddate-read-only"><span class="octicon octicon-link"></span></a>job.created:Date (read-only)</h3>
+<a name="jobcreateddate-read-only" class="anchor" href="#jobcreateddate-read-only"><span class="octicon octicon-link"></span></a>
+<code>job.created:Date</code> (read-only)</h3>
 
 <p>The <code>Date</code> at which the job was first saved to the database. Will be set automatically on the first call to <code>save</code> or when the job is loaded from the database.</p>
 
 <h3>
-<a name="jobupdateddate-read-only" class="anchor" href="#jobupdateddate-read-only"><span class="octicon octicon-link"></span></a>job.updated:Date (read-only)</h3>
+<a name="jobupdateddate-read-only" class="anchor" href="#jobupdateddate-read-only"><span class="octicon octicon-link"></span></a>
+<code>job.updated:Date</code> (read-only)</h3>
 
 <p>The <code>Date</code> at which the job was last saved to the database. Will be updated automatically for every operation that modifies the job in the database (including <code>job.log</code>).</p>
 
 <h3>
-<a name="jobsavecallbackfunctionpromiseself" class="anchor" href="#jobsavecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.save([callback:Function]):Promise(self)</h3>
+<a name="jobsavecallbackfunctionpromiseself" class="anchor" href="#jobsavecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>job.save([callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Saves the job to the database. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
 <p>If the job did not exist in the database before, it will be assigned <a href="#jobidstring-read-only">a unique ID</a> and its <a href="#jobstatestring-read-only">state</a> will be set to <a href="#pending">pending</a>.</p>
 
 <h3>
-<a name="jobupdateprogressnumber-messagestring-callbackfunctionpromiseself" class="anchor" href="#jobupdateprogressnumber-messagestring-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.update(progress:Number, [message:String], [callback:Function]):Promise(self)</h3>
+<a name="jobupdateprogressnumber-messagestring-callbackfunctionpromiseself" class="anchor" href="#jobupdateprogressnumber-messagestring-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>job.update(progress:Number, [message:String], [callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Updates the <a href="#jobprogressnumber-read-only">job's progress</a> to the given <code>progress</code>. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
@@ -324,19 +373,28 @@ function doSomeWork(job) {
 <p>If <code>message</code> is provided, a matching log entry will be created.</p>
 
 <h3>
-<a name="joblogmessagestring-details-callbackfunctionpromiseself" class="anchor" href="#joblogmessagestring-details-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.log(message:String, [details:*], [callback:Function]):Promise(self)</h3>
+<a name="joblogmessagestring-details-callbackfunctionpromiseself" class="anchor" href="#joblogmessagestring-details-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>job.log(message:String, [details:*], [callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Logs the given <code>message</code> to the job's log with the current timestamp. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
 <p>If <code>details</code> is provided, it will be serialized to JSON and stored on the log message.</p>
 
 <h3>
-<a name="jobcompletecallbackfunctionpromiseself" class="anchor" href="#jobcompletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.complete([callback:Function]):Promise(self)</h3>
+<a name="jobstartcallbackfunctionpromiseself" class="anchor" href="#jobstartcallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>job.start([callback:Function]):Promise(self)</code>
+</h3>
+
+<p>Sets the job's state to <code>progress</code> and creates a log entry. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
+
+<h3>
+<a name="jobcompletecallbackfunctionpromiseself" class="anchor" href="#jobcompletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>job.complete([callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Sets the job's state to <code>done</code> and creates a log entry indicating success. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
 <h3>
-<a name="jobfaildetails-callbackfunctionpromiseself" class="anchor" href="#jobfaildetails-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.fail([details:*], [callback:Function]):Promise(self)</h3>
+<a name="jobfaildetails-callbackfunctionpromiseself" class="anchor" href="#jobfaildetails-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>job.fail([details:*], [callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Increments the <a href="#jobfailuresnumber-read-only">job's number of failures</a> and creates a log entry indicating failure. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
@@ -347,7 +405,8 @@ function doSomeWork(job) {
 <p>If <code>details</code> is provided, it will be serialized to JSON and stored on the log message.</p>
 
 <h3>
-<a name="jobdeletecallbackfunctionpromiseself" class="anchor" href="#jobdeletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a>job.delete([callback:Function]):Promise(self)</h3>
+<a name="jobdeletecallbackfunctionpromiseself" class="anchor" href="#jobdeletecallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>job.delete([callback:Function]):Promise(self)</code>
+</h3>
 
 <p>Deletes the job from the database. Resolves to the <code>Job</code> instance itself on success or is rejected with the error returned by <code>redis</code> for the underlying commands.</p>
 
