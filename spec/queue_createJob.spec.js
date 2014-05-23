@@ -1,10 +1,19 @@
 var expect = require('expect.js');
+var Promise = require('bluebird');
 var ZugZug = require('../lib/zugzug');
 var Job = require('../lib/job');
 
 describe('queue.createJob([data, [maxFailures]]):Job', function() {
-  var zz = new ZugZug();
-  var q = zz.queue();
+  var q, zz;
+  before(function() {
+    zz = new ZugZug();
+    q = zz.queue();
+  });
+  after(function(done) {
+    Promise.promisify(zz._client.flushall, zz._client)()
+    .then(zz.quit.bind(zz))
+    .done(function() {done();});
+  });
   it('returns a new Job instance', function() {
     expect(q.createJob()).to.be.a(Job);
   });

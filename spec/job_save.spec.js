@@ -1,6 +1,5 @@
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var redis = require('redis');
 var ZugZug = require('../lib/zugzug');
 var Job = require('../lib/job');
 
@@ -10,11 +9,15 @@ describe('job.save():self', function() {
     zz = new ZugZug();
   });
   afterEach(function(done) {
-    redis.createClient().flushall(done);
+    Promise.promisify(zz._client.flushall, zz._client)()
+    .then(zz.quit.bind(zz))
+    .done(function() {done();});
   });
-  it('returns a promise', function() {
+  it('returns a promise', function(done) {
     var job = new Job(zz, 'default');
-    expect(job.save()).to.be.a(Promise);
+    var p = job.save();
+    expect(p).to.be.a(Promise);
+    p.thenReturn().done(done);
   });
   it('resolves to the instance', function(done) {
     var job = new Job(zz, 'default');

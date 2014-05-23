@@ -1,6 +1,5 @@
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var redis = require('redis');
 var ZugZug = require('../lib/zugzug');
 var Job = require('../lib/job');
 
@@ -11,13 +10,15 @@ describe('queue.next([timeout]):Promise(Job?)', function() {
     q = zz.queue();
   });
   afterEach(function(done) {
-    redis.createClient().flushall(done);
+    Promise.promisify(zz._client.flushall, zz._client)()
+    .then(zz.quit.bind(zz))
+    .done(function() {done();});
   });
   it('returns a promise', function() {
     expect(q.next(1)).to.be.a(Promise);
   });
   it('resolves to null if the timeout was reached', function(done) {
-    this.timeout(0);
+    this.timeout(5000);
     q.next(1)
     .then(function(res) {
       expect(res).to.equal(null);
@@ -25,7 +26,7 @@ describe('queue.next([timeout]):Promise(Job?)', function() {
     .done(done);
   });
   it('resolves to a Job when a job is in the queue', function(done) {
-    this.timeout(0);
+    this.timeout(5000);
     q.createJob().save()
     .then(function() {
       return q.next();
@@ -36,7 +37,7 @@ describe('queue.next([timeout]):Promise(Job?)', function() {
     .done(done);
   });
   it('resolves to a Job when a job is added to the queue', function(done) {
-    this.timeout(0);
+    this.timeout(5000);
     /*global process: false */
     process.nextTick(function() {
       q.createJob().save().done();

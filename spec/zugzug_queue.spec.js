@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var redis = require('redis');
+var Promise = require('bluebird');
 var ZugZug = require('../lib/zugzug');
 var Queue = require('../lib/queue');
 
@@ -9,7 +9,9 @@ describe('zugzug.queue([name]):Queue', function() {
     zz = new ZugZug();
   });
   afterEach(function(done) {
-    redis.createClient().flushall(done);
+    Promise.promisify(zz._client.flushall, zz._client)()
+    .then(zz.quit.bind(zz))
+    .done(function() {done();});
   });
   it('returns a new Queue instance', function() {
     expect(zz.queue('foo')).to.be.a(Queue);

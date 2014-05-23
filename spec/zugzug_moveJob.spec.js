@@ -1,6 +1,5 @@
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var redis = require('redis');
 var ZugZug = require('../lib/zugzug');
 var Job = require('../lib/job');
 
@@ -10,10 +9,14 @@ describe('zugzug.moveJob(id, toQueue):Promise(Boolean)', function() {
     zz = new ZugZug();
   });
   afterEach(function(done) {
-    redis.createClient().flushall(done);
+    Promise.promisify(zz._client.flushall, zz._client)()
+    .then(zz.quit.bind(zz))
+    .done(function() {done();});
   });
-  it('returns a promise', function() {
-    expect(zz.moveJob(0, 'default')).to.be.a(Promise);
+  it('returns a promise', function(done) {
+    var p = zz.moveJob(0, 'default');
+    expect(p).to.be.a(Promise);
+    p.thenReturn().done(done);
   });
   it('resolves to false if the job does not exist', function(done) {
     zz.moveJob(0, 'default')

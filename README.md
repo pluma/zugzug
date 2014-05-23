@@ -167,6 +167,14 @@ If you want to restart a failed job in a worker script, this will let you do tha
 
 If you only want the failed job to be re-enqueued, use [zugzug.resetJob](#zugzugresetjobidstring-callbackfunctionpromiseboolean) instead.
 
+### `zugzug.quit([callback:Function]):Promise(self)`
+
+Terminates the database connection cleanly. Resolves to the `ZugZug` instance itself or is rejected with the error returned by `redis` for the underlying `QUIT` command.
+
+Note that the Redis connection used by a `ZugZug` instance is shared by all queues and jobs associated with it.
+
+It is probably a bad idea to call this method if [queue.next](#queuenexttimeoutnumber-callbackfunctionpromisejob) is still waiting for new jobs.
+
 ## Queues
 
 ### `queue.createJob([data:*, [maxFailures:Number]]):Job`

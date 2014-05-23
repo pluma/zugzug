@@ -1,6 +1,5 @@
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var redis = require('redis');
 var ZugZug = require('../lib/zugzug');
 
 describe('zugzug.useDatabase(db):Promise(self)', function() {
@@ -9,11 +8,14 @@ describe('zugzug.useDatabase(db):Promise(self)', function() {
     zz = new ZugZug();
   });
   afterEach(function(done) {
-    redis.createClient().flushall(done);
+    Promise.promisify(zz._client.flushall, zz._client)()
+    .then(zz.quit.bind(zz))
+    .done(function() {done();});
   });
-  it('returns a promise', function() {
-    var res = zz.useDatabase(1);
-    expect(res).to.be.a(Promise);
+  it('returns a promise', function(done) {
+    var p = zz.useDatabase(5);
+    expect(p).to.be.a(Promise);
+    p.thenReturn().done(done);
   });
   it('selects the given database', function(done) {
     var selectedDb = null;

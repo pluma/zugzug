@@ -1,6 +1,5 @@
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var redis = require('redis');
 var ZugZug = require('../lib/zugzug');
 var Job = require('../lib/job');
 
@@ -11,12 +10,16 @@ describe('job.fail([details]):Promise(self)', function() {
     job = new Job(zz, 'default');
   });
   afterEach(function(done) {
-    redis.createClient().flushall(done);
+    Promise.promisify(zz._client.flushall, zz._client)()
+    .then(zz.quit.bind(zz))
+    .done(function() {done();});
   });
   it('returns a promise', function(done) {
     job.save()
     .then(function() {
-      expect(job.fail()).to.be.a(Promise);
+      var p = job.fail();
+      expect(p).to.be.a(Promise);
+      return p.thenReturn();
     })
     .done(done);
   });
