@@ -36,7 +36,7 @@
 
 <p><strong>ZugZug</strong> is an unfancy task queue built on <a href="http://redis.io">Redis</a>.</p>
 
-<p><a href="http://nodejs.org/api/documentation.html#documentation_stability_index"><img src="http://b.repl.ca/v1/stability-1_--_experimental-orange.png" alt="stability 1 - experimental"></a> <a href="http://pluma.mit-license.org"><img src="http://b.repl.ca/v1/license-MIT-blue.png" alt="license - MIT"></a> <a href="https://flattr.com/submit/auto?user_id=pluma&amp;url=https://github.com/pluma/zugzug"><img src="https://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this"></a></p>
+<p><a href="http://nodejs.org/api/documentation.html#documentation_stability_index"><img src="http://b.repl.ca/v1/stability-2_--_unstable-yellow.png" alt="stability 2 - unstable"></a> <a href="http://pluma.mit-license.org"><img src="http://b.repl.ca/v1/license-MIT-blue.png" alt="license - MIT"></a> <a href="https://flattr.com/submit/auto?user_id=pluma&amp;url=https://github.com/pluma/zugzug"><img src="https://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this"></a></p>
 
 <p><a href="https://travis-ci.org/pluma/zugzug"><img src="https://travis-ci.org/pluma/zugzug.png?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/pluma/zugzug?branch=master"><img src="https://coveralls.io/repos/pluma/zugzug/badge.png?branch=master" alt="Coverage Status"></a></p>
 
@@ -156,6 +156,8 @@ make
 
 <p>In addition to the options accepted by <a href="https://github.com/mranney/node_redis#rediscreateclientport-host-options">redis</a>, ZugZug recognizes <code>port</code> and <code>server</code> and passes them on correctly.</p>
 
+<p>If <code>options.prefix</code> is defined, all Redis keys will use that prefix. Defaults to <code>zugzug:</code>.</p>
+
 <h3>
 <a name="zugzugusedatabasedbnumber-callbackfunctionpromiseself" class="anchor" href="#zugzugusedatabasedbnumber-callbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>zugzug.useDatabase(db:Number, [callback:Function]):Promise(self)</code>
 </h3>
@@ -221,6 +223,16 @@ make
 <p>If you want to restart a failed job in a worker script, this will let you do that.</p>
 
 <p>If you only want the failed job to be re-enqueued, use <a href="#zugzugresetjobidstring-callbackfunctionpromiseboolean">zugzug.resetJob</a> instead.</p>
+
+<h3>
+<a name="zugzugquitcallbackfunctionpromiseself" class="anchor" href="#zugzugquitcallbackfunctionpromiseself"><span class="octicon octicon-link"></span></a><code>zugzug.quit([callback:Function]):Promise(self)</code>
+</h3>
+
+<p>Terminates the database connection cleanly. Resolves to the <code>ZugZug</code> instance itself or is rejected with the error returned by <code>redis</code> for the underlying <code>QUIT</code> command.</p>
+
+<p>Note that the Redis connection used by a <code>ZugZug</code> instance is shared by all queues and jobs associated with it.</p>
+
+<p>It is probably a bad idea to call this method if <a href="#queuenexttimeoutnumber-callbackfunctionpromisejob">queue.next</a> is still waiting for new jobs.</p>
 
 <h2>
 <a name="queues" class="anchor" href="#queues"><span class="octicon octicon-link"></span></a>Queues</h2>
