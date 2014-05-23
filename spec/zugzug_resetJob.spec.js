@@ -42,7 +42,12 @@ describe('zugzug.resetJob(id):Promise(Boolean)', function() {
     })
     .then(function() {
       expect(j0.state).to.equal('error');
-      return zz.resetJob(j0.id);
+      return new Promise(function(resolve, reject) {
+        /*global setTimeout:false */
+        setTimeout(function() {
+          zz.resetJob(j0.id).then(resolve, reject);
+        }, 1);
+      });
     })
     .then(function() {
       return zz.getJob(j0.id);

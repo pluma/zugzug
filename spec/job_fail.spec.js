@@ -36,7 +36,12 @@ describe('job.fail([details]):Promise(self)', function() {
     .then(function() {
       updated = job.updated;
       expect(job.failures).to.equal(0);
-      return job.fail();
+      return new Promise(function(resolve, reject) {
+        /*global setTimeout:false */
+        setTimeout(function() {
+          job.fail().then(resolve, reject);
+        }, 1);
+      });
     })
     .then(function() {
       expect(Number(job.updated)).to.be.greaterThan(Number(updated));

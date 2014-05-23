@@ -36,7 +36,12 @@ describe('job.update(progress, [message]):Promise(self)', function() {
     job.save()
     .then(function() {
       updated = job.updated;
-      return job.update(progress);
+      return new Promise(function(resolve, reject) {
+        /*global setTimeout:false */
+        setTimeout(function() {
+          job.update(progress).then(resolve, reject);
+        }, 1);
+      });
     })
     .then(function() {
       expect(Number(job.updated)).to.be.greaterThan(Number(updated));

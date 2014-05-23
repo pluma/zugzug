@@ -35,7 +35,12 @@ describe('job.log(message, [details]):Promise(self)', function() {
     job.save()
     .then(function() {
       updated = job.updated;
-      return job.log('hello');
+      return new Promise(function(resolve, reject) {
+        /*global setTimeout:false */
+        setTimeout(function() {
+          job.log('hello').then(resolve, reject);
+        }, 1);
+      });
     })
     .then(function() {
       expect(Number(job.updated)).to.be.greaterThan(Number(updated));

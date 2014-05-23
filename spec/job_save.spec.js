@@ -24,7 +24,8 @@ describe('job.save():self', function() {
     })
     .done(done);
   });
-  it('assigns the job a new id', function(done) {
+  it('assigns the job a new id if job has no id', function(done) {
+    var jobId;
     var job = new Job(zz, 'default');
     expect(job.id).to.be(undefined);
     var m = zz._client.multi()
@@ -41,22 +42,55 @@ describe('job.save():self', function() {
       return Promise.promisify(m.exec, m)();
     })
     .spread(function(id) {
+      jobId = id;
       expect(id).to.equal(job.id);
+      return job.save();
+    })
+    .then(function() {
+      expect(job.id).to.equal(jobId);
     })
     .done(done);
   });
-  it('updates the job and sets its state to "pending"', function(done) {
+  it('sets the job\'s state to "pending" if job has no id', function(done) {
+    var state = 'error';
     var job = new Job(zz, 'default');
     var now = new Date();
-    expect(job.created).to.be(undefined);
-    expect(job.updated).to.be(undefined);
+    expect(job.id).to.be(undefined);
     expect(job.state).to.be(undefined);
     job.save()
     .then(function() {
-      expect(+job.created).not.to.be.lessThan(+now);
-      expect(+job.updated).not.to.be.lessThan(+now);
-      expect(+job.updated).to.equal(+job.created);
-      expect(job.state).to.equal('pending');
+      expect(job.state).to.be('pending');
+      job.state = state;
+      return job.save();
+    })
+    .then(function() {
+      expect(job.state).to.be(state);
+    })
+    .done(done);
+  });
+  it('updates the job and sets its timestamps', function(done) {
+    var job = new Job(zz, 'default');
+    var now = new Date();
+    var created, updated;
+    expect(job.created).to.be(undefined);
+    expect(job.updated).to.be(undefined);
+    job.save()
+    .then(function() {
+      expect(Number(job.created)).not.to.be.lessThan(Number(now));
+      expect(Number(job.updated)).not.to.be.lessThan(Number(now));
+      expect(Number(job.updated)).to.equal(Number(job.created));
+      created = job.created;
+      updated = job.updated;
+      return new Promise(function(resolve, reject) {
+        /*global setTimeout:false */
+        setTimeout(function() {
+          job.save().then(resolve, reject);
+        }, 1);
+      });
+    })
+    .then(function() {
+      expect(Number(job.created)).to.equal(Number(created));
+      expect(Number(job.updated)).to.be.greaterThan(Number(updated));
     })
     .done(done);
   });

@@ -42,7 +42,12 @@ describe('zugzug.startJob(id):Promise(Job?)', function() {
     })
     .then(function() {
       expect(j0.state).to.equal('error');
-      return zz.startJob(j0.id);
+      return new Promise(function(resolve, reject) {
+        /*global setTimeout:false */
+        setTimeout(function() {
+          zz.startJob(j0.id).then(resolve, reject);
+        }, 1);
+      });
     })
     .then(function(j1) {
       expect(j1.id).to.equal(j0.id);

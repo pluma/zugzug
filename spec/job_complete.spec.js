@@ -36,7 +36,12 @@ describe('job.complete():Promise(self)', function() {
     .then(function() {
       updated = job.updated;
       expect(job.state).to.equal('pending');
-      return job.complete();
+      return new Promise(function(resolve, reject) {
+        /*global setTimeout:false */
+        setTimeout(function() {
+          job.complete().then(resolve, reject);
+        }, 1);
+      });
     })
     .then(function() {
       expect(Number(job.updated)).to.be.greaterThan(Number(updated));
