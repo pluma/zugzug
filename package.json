@@ -21,6 +21,7 @@
   ],
   "dependencies": {
     "bluebird": "^1.2.4",
+    "json-stringify-safe": "^5.0.0",
     "redis": "^0.10.2"
   },
   "devDependencies": {
